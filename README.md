@@ -74,18 +74,36 @@ OpenThemis（Themis 舆情分析系统）是一个面向品牌、公关与运营
 
 ### 环境要求
 - Node.js 18+（采集层需 OpenCLI，要求 Node ≥ 21）
-- 已安装并登录 OpenCLI 浏览器扩展（采集功能需要）
+- 采集功能需要：已安装 [OpenCLI](https://github.com/jackwener/OpenCLI)（`npm i -g @jackwener/opencli`）+ Chrome 浏览器扩展，并在 Chrome 登录目标平台
 
-### 启动
+### 安装
 
 ```bash
-# 1) 采集层（独立进程）
-cd collector && npm install && npm start    # http://localhost:4001
-
-# 2) 分析执行层
-npm install
-npm run dev                                  # http://localhost:3000
+npm run setup     # = npm install + 采集层依赖安装
 ```
+
+> 也可分别安装：根目录 `npm install`；采集层 `npm --prefix collector install`。
+
+### 开发模式
+
+```bash
+# 一键同时启动采集层(:4001) + 分析层(:3000)
+npm run dev:all
+
+# 或分两个终端分别启动：
+npm run collector    # 采集层 → http://localhost:4001
+npm run dev          # 分析层 → http://localhost:3000
+```
+
+### 生产部署（npm）
+
+```bash
+npm run build        # 构建分析层
+npm run collector &  # 后台启动采集层（依赖宿主机 Chrome）
+npm run start        # 启动分析层 → http://localhost:3000
+```
+
+> 生产环境建议用 `pm2` 等进程管理器分别托管「采集层」与「分析层」两个进程，并配置开机自启与崩溃重启。
 
 ### 配置 LLM
 进入 `设置 → LLM 配置`，填写 OpenAI 兼容的 Endpoint / Model / API Key 并测试连接。也可用环境变量 `LLM_ENDPOINT / LLM_API_KEY / LLM_MODEL` 兜底（见 `.env.example`）。
@@ -94,6 +112,15 @@ npm run dev                                  # http://localhost:3000
 1. 设置 → 采集渠道：确认渠道已登录（在 Chrome 登录对应平台）
 2. 舆情分析 → 新建监测：输入监测主题，AI 拆解关键词并多渠道采集
 3. 查看研判报告：情感分布、话题热度、负面深挖、舆情研判一屏呈现
+
+### 仅分析、不采集（无桌面 Chrome 的服务器）
+
+采集层依赖宿主机 Chrome，**无法在无图形界面的服务器上运行**。这类环境可只部署分析层：
+通过 Excel / CSV / ReviewMine 导入数据做分析；首页与看板的微博实时数据会优雅降级为内置示例。
+
+```bash
+npm install && npm run build && npm run start
+```
 
 ## 六、项目结构
 

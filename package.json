@@ -5,7 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "collector": "npm --prefix collector start",
+    "collector:install": "npm --prefix collector install",
+    "setup": "npm install && npm run collector:install",
+    "dev:all": "node scripts/dev-all.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^12.8.0",
