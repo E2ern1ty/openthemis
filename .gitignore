@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+collector/node_modules/
+
+# Next.js
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# Runtime data (SQLite + 登录态/Cookie)
+data/
+collector/data/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store

@@ -1,0 +1,44 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#4F46E5"/>
+    </linearGradient>
+  </defs>
+
+  <!-- rounded square background -->
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <!-- radar sweep arcs -->
+  <g stroke="#FFFFFF" stroke-linecap="round" fill="none" opacity="0.28">
+    <path d="M256 392 a136 136 0 0 1 -136 -136" stroke-width="14"/>
+    <path d="M256 392 a96 96 0 0 1 -96 -96" stroke-width="14"/>
+  </g>
+
+  <!-- Themis balance scale, white -->
+  <g stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- vertical pillar -->
+    <path d="M256 132 V392"/>
+    <!-- base -->
+    <path d="M196 400 H316"/>
+    <!-- beam -->
+    <path d="M150 178 H362"/>
+    <!-- top knob -->
+    <circle cx="256" cy="132" r="16" fill="#FFFFFF" stroke="none"/>
+    <!-- left hanger lines -->
+    <path d="M150 178 L120 252"/>
+    <path d="M150 178 L180 252"/>
+    <!-- right hanger lines -->
+    <path d="M362 178 L332 252"/>
+    <path d="M362 178 L392 252"/>
+  </g>
+
+  <!-- left pan -->
+  <path d="M104 252 H196 a46 46 0 0 1 -92 0 Z" fill="#FFFFFF"/>
+  <!-- right pan -->
+  <path d="M316 252 H408 a46 46 0 0 1 -92 0 Z" fill="#FFFFFF"/>
+
+  <!-- radar ping dot -->
+  <circle cx="256" cy="256" r="20" fill="#FFFFFF"/>
+  <circle cx="256" cy="256" r="9" fill="#4F46E5"/>
+</svg>
