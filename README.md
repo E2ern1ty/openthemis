@@ -24,22 +24,22 @@ OpenThemis（Themis 舆情分析系统）是一个面向品牌、公关与运营
 ### 首页 · 实时舆情概览
 启动后从微博渠道随机捞取热搜话题，实时展示情感分布、热门话题与风险研判。
 
-![首页](docs/screenshots/01-home.png)
+<p align="center"><img src="docs/screenshots/01-home.png" width="820" alt="首页" /></p>
 
 ### 舆情看板 · 定时刷新 + 话题关键词趋势
 支持 30 秒 / 1 / 5 / 10 分钟定时刷新，折线图展示关键词热度随时间的变化，并提供情感分布、分类分布与实时热搜榜。
 
-![舆情看板](docs/screenshots/02-dashboard.png)
+<p align="center"><img src="docs/screenshots/02-dashboard.png" width="820" alt="舆情看板" /></p>
 
 ### 舆情分析 · 多渠道采集与研判
 输入监测主题，AI 自动拆解关键词并多渠道采集，输出情感、话题、负面深挖与舆情研判。
 
-![舆情分析](docs/screenshots/03-radar.png)
+<p align="center"><img src="docs/screenshots/03-radar.png" width="820" alt="舆情分析" /></p>
 
 ### 设置 · LLM 配置（OpenAI 兼容）
 所有内置分析统一走可视化配置的 OpenAI 兼容 LLM，支持热更新与连接测试。
 
-![设置](docs/screenshots/04-settings.png)
+<p align="center"><img src="docs/screenshots/04-settings.png" width="820" alt="设置" /></p>
 
 ## 四、技术架构（三层，可独立部署/替换）
 
