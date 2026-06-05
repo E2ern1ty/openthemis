@@ -2,6 +2,8 @@
 
 > 多渠道采集、情感研判、话题聚类、风险预警，一站式 AI 舆情分析。
 
+[English](README.en.md) · **简体中文**
+
 ---
 
 ## 一、产品定位
@@ -143,3 +145,7 @@ npm install && npm run build && npm run start
 ├── collector/            # 采集层（独立 OpenCLI 网关进程）
 └── data/                 # 运行时数据（SQLite，gitignored）
 ```
+
+## 七、许可证
+
+本项目基于 [MIT License](LICENSE) 开源。© 2026 OpenThemis
