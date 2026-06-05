@@ -80,7 +80,10 @@ export async function searchChannel(channelId, keyword, brand, limit = 20) {
     throw new Error(`unknown channel: ${channelId}`);
   }
 
-  const args = [channel.site, 'search', keyword, '--limit', String(limit), '-f', 'json'];
+  // 默认 `<site> search <keyword> --limit N`；渠道可用 buildArgs 自定义命令形态（如抖音 hashtag）
+  const args = channel.buildArgs
+    ? channel.buildArgs(keyword, limit)
+    : [channel.site, 'search', keyword, '--limit', String(limit), '-f', 'json'];
   console.log(`[Collector] opencli ${args.join(' ')}`);
   const { code, stdout, stderr } = await runOpenCli(args);
 

@@ -14,7 +14,7 @@ OpenThemis is an **AI-driven public-opinion (舆情) analysis system** for brand
 
 An automatically chained **"Collect → Sentiment → Topics → Risk"** analysis pipeline:
 
-1. **Multi-channel collection** — Unified access to open channels such as Weibo and Xiaohongshu, plus Excel/CSV import. Login state reuses your browser session, so no separate in-app login is needed.
+1. **Multi-channel collection** — Unified access to open channels such as Weibo, Xiaohongshu, Douyin, X (Twitter), and Reddit, plus Excel/CSV import. Login state reuses your browser session, so no separate in-app login is needed.
 2. **Sentiment assessment** — Classifies every item as positive / neutral / negative and quantifies the overall opinion health and mood trend.
 3. **Topic clustering** — Automatically identifies core discussion topics and their sentiment, surfacing high-heat and high-negativity issues.
 4. **Risk alerting** — Mines negative opinion, judges severity (systemic flaw vs. occasional complaint), and distills key findings with response suggestions.

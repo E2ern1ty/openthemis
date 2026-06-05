@@ -48,17 +48,46 @@ npm start          # 默认监听 http://localhost:4001
 | `OPENCLI_BIN`       | `opencli`     | opencli 可执行文件路径               |
 | `OPENCLI_TIMEOUT_MS`| `120000`      | 单次 search 超时                     |
 
+## 已内置渠道
+
+| id | 名称 | OpenCLI 命令 | 登录 |
+| -- | ---- | ------------ | ---- |
+| `xiaohongshu` | 小红书 | `xiaohongshu search` | 需 Chrome 登录 |
+| `weibo` | 微博 | `weibo search` | 需 Chrome 登录 |
+| `douyin` | 抖音 | `douyin hashtag search`（话题） | 需创作者后台登录 |
+| `twitter` | X (Twitter) | `twitter search` | 需 Chrome 登录 x.com |
+| `reddit` | Reddit | `reddit search` | 通常免登录 |
+
 ## 新增渠道
 
-编辑 `channels.mjs`，追加一条：
+编辑 `channels.mjs`，追加一条。多数渠道默认走 `opencli <site> search <query>`，
+只需提供 `map(row)` 把输出列归一化为 `{ content, likes, date, url }`：
+
+```js
+{
+  id: 'reddit',
+  name: 'Reddit',
+  site: 'reddit',
+  loginUrl: 'https://www.reddit.com',
+  map: (row) => ({
+    content: [row.title, row.selftext].filter(Boolean).join(' '),
+    likes: Number(row.score) || 0,
+    date: row.created_utc,   // 支持 Unix 时间戳
+    url: row.url,
+  }),
+}
+```
+
+若某渠道命令形态不同（例如抖音用 `hashtag search --keyword`），用 `buildArgs` 自定义：
 
 ```js
 {
   id: 'douyin',
   name: '抖音',
-  site: 'douyin',            // opencli 的 site 名
+  site: 'douyin',
   loginUrl: 'https://www.douyin.com',
-  map: (row) => ({ content: row.title, likes: row.likes, date: row.date, url: row.url }),
+  buildArgs: (keyword, limit) => ['douyin', 'hashtag', 'search', '--keyword', keyword, '--limit', String(limit), '-f', 'json'],
+  map: (row) => ({ content: `#${row.name}`, likes: Number(row.view_count) || 0, date: '', url: '' }),
 }
 ```
 
