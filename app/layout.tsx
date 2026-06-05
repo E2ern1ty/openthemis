@@ -1,5 +1,6 @@
 import './globals.css';
 import { AssistantProvider } from '@/lib/assistant-context';
+import { I18nProvider } from '@/lib/i18n';
 import FloatingAssistant from '@/components/layout/FloatingAssistant';
 
 export const metadata = {
@@ -11,10 +12,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="zh-CN">
       <body>
-        <AssistantProvider>
-          {children}
-          <FloatingAssistant />
-        </AssistantProvider>
+        <I18nProvider>
+          <AssistantProvider>
+            {children}
+            <FloatingAssistant />
+          </AssistantProvider>
+        </I18nProvider>
       </body>
     </html>
   );

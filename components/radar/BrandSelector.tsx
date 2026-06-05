@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useI18n } from '@/lib/i18n';
 
 export interface SourceOption {
   id: string;
@@ -37,10 +38,10 @@ interface Props {
 }
 
 const DATE_RANGES = [
-  { label: '近7天', value: '7' },
-  { label: '近15天', value: '15' },
-  { label: '近30天', value: '30' },
-  { label: '近90天', value: '90' },
+  { days: 7, value: '7' },
+  { days: 15, value: '15' },
+  { days: 30, value: '30' },
+  { days: 90, value: '90' },
 ];
 
 const TAG_PALETTE = [
@@ -67,6 +68,7 @@ function getTagColor(tag: string): string {
 }
 
 export default function BrandSelector({ onStartAnalysis, loading, onCancel }: Props) {
+  const { t, lang } = useI18n();
   const [ownBrand, setOwnBrand] = useState('');
   const [researchQuestion, setResearchQuestion] = useState('');
   const [dateRange, setDateRange] = useState('30');
@@ -148,7 +150,7 @@ export default function BrandSelector({ onStartAnalysis, loading, onCancel }: Pr
     const val = manualInput.trim();
     if (!val) return;
     if (!suggestions.find(s => s.name === val)) {
-      setSuggestions(prev => [...prev, { name: val, tag: '自定义', priority: 'medium' }]);
+      setSuggestions(prev => [...prev, { name: val, tag: t('自定义', 'Custom'), priority: 'medium' }]);
     }
     if (!selectedRef.current.includes(val)) {
       setSelectedKeywords([...selectedRef.current, val]);
@@ -178,7 +180,7 @@ export default function BrandSelector({ onStartAnalysis, loading, onCancel }: Pr
   };
 
   const formatUploadDate = (d: string) => {
-    try { return new Date(d).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' }); }
+    try { return new Date(d).toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', { month: '2-digit', day: '2-digit' }); }
     catch { return d; }
   };
 
@@ -198,14 +200,14 @@ export default function BrandSelector({ onStartAnalysis, loading, onCancel }: Pr
   return (
     <div className="card overflow-hidden">
       <div className="px-5 py-4 bg-gradient-to-r from-blue-50/80 to-indigo-50/60 border-b border-slate-100">
-        <h2 className="text-base font-semibold text-slate-800">新建舆情监测</h2>
-        <p className="text-xs text-slate-500 mt-0.5">输入监测主题，AI 自动拆解为检索关键词</p>
+        <h2 className="text-base font-semibold text-slate-800">{t('新建舆情监测', 'New opinion monitor')}</h2>
+        <p className="text-xs text-slate-500 mt-0.5">{t('输入监测主题，AI 自动拆解为检索关键词', 'Enter a topic; AI decomposes it into search keywords')}</p>
       </div>
 
       <div className="p-5 space-y-5">
         {/* Step 1: My Brand */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">本方主体</label>
+          <label className="block text-sm font-medium text-slate-700 mb-2">{t('本方主体', 'Your subject')}</label>
           {ownBrand ? (
             <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-blue-50 text-blue-700 border border-blue-200/60">
               {ownBrand}
@@ -218,7 +220,7 @@ export default function BrandSelector({ onStartAnalysis, loading, onCancel }: Pr
           ) : (
             <input
               type="text"
-              placeholder="输入要监测的主体名称，回车确认"
+              placeholder={t('输入要监测的主体名称，回车确认', 'Enter the subject to monitor, press Enter')}
               className="px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white text-slate-700 placeholder:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-300 w-64 transition-colors"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
@@ -232,18 +234,18 @@ export default function BrandSelector({ onStartAnalysis, loading, onCancel }: Pr
               }}
             />
           )}
-          <p className="text-xs text-slate-400 mt-1.5">分析时将以此主体视角研判舆情风险与应对</p>
+          <p className="text-xs text-slate-400 mt-1.5">{t('分析时将以此主体视角研判舆情风险与应对', 'Analysis assesses risk and response from this subject\'s perspective')}</p>
         </div>
 
         {/* Step 2: Research Question */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">监测主题</label>
+          <label className="block text-sm font-medium text-slate-700 mb-2">{t('监测主题', 'Monitor topic')}</label>
           <div className="flex items-center gap-2">
             <input
               value={researchQuestion}
               onChange={e => setResearchQuestion(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && generateKeywords()}
-              placeholder='例如："某品牌近期负面舆情监测"、"行业热点事件追踪"'
+              placeholder={t('例如："某品牌近期负面舆情监测"、"行业热点事件追踪"', 'e.g. "Recent negative opinion on a brand", "Hot industry event tracking"')}
               className="flex-1 px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-300 placeholder:text-slate-400"
               disabled={aiLoading}
             />
@@ -255,9 +257,9 @@ export default function BrandSelector({ onStartAnalysis, loading, onCancel }: Pr
               {aiLoading ? (
                 <span className="inline-flex items-center gap-1.5">
                   <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  拆解中
+                  {t('拆解中', 'Decomposing')}
                 </span>
-              ) : '拆解关键词'}
+              ) : t('拆解关键词', 'Decompose keywords')}
             </button>
           </div>
         </div>
@@ -269,14 +271,14 @@ export default function BrandSelector({ onStartAnalysis, loading, onCancel }: Pr
               <p className="text-xs text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg">{intentSummary}</p>
             )}
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-600">检索关键词</span>
+              <span className="text-xs font-medium text-slate-600">{t('检索关键词', 'Search keywords')}</span>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] text-slate-400">{selectedKeywords.length}/{suggestions.length} 已选</span>
+                <span className="text-[10px] text-slate-400">{t(`${selectedKeywords.length}/${suggestions.length} 已选`, `${selectedKeywords.length}/${suggestions.length} selected`)}</span>
                 <button
                   onClick={() => setSelectedKeywords(selectedKeywords.length === suggestions.length ? [] : suggestions.map(s => s.name))}
                   className="text-[10px] text-blue-600 hover:text-blue-800 font-medium"
                 >
-                  {selectedKeywords.length === suggestions.length ? '取消全选' : '全选'}
+                  {selectedKeywords.length === suggestions.length ? t('取消全选', 'Deselect all') : t('全选', 'Select all')}
                 </button>
               </div>
             </div>
@@ -319,17 +321,17 @@ export default function BrandSelector({ onStartAnalysis, loading, onCancel }: Pr
                 value={manualInput}
                 onChange={e => setManualInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && addManualKeyword()}
-                placeholder="手动添加关键词"
+                placeholder={t('手动添加关键词', 'Add keyword manually')}
                 className="px-2.5 py-1 text-sm border border-dashed border-slate-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-400/40 w-36"
               />
-              <button onClick={addManualKeyword} className="text-xs text-blue-600 hover:text-blue-800 font-medium">添加</button>
+              <button onClick={addManualKeyword} className="text-xs text-blue-600 hover:text-blue-800 font-medium">{t('添加', 'Add')}</button>
             </div>
           </div>
         )}
 
         {/* Step 4: Data sources */}
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-2">数据源</label>
+          <label className="block text-sm font-medium text-slate-700 mb-2">{t('数据源', 'Data sources')}</label>
           <div className="flex flex-wrap items-center gap-2">
             {sourceOptions.map(src => (
               <button
@@ -365,7 +367,7 @@ export default function BrandSelector({ onStartAnalysis, loading, onCancel }: Pr
                   <line x1="12" y1="18" x2="12" y2="12" />
                   <line x1="9" y1="15" x2="15" y2="15" />
                 </svg>
-                导入数据
+                {t('导入数据', 'Import data')}
                 {selectedImportIds.length > 0 && (
                   <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/20">{selectedImportIds.length}</span>
                 )}
@@ -376,16 +378,16 @@ export default function BrandSelector({ onStartAnalysis, loading, onCancel }: Pr
                   <div className="fixed inset-0 z-30" onClick={() => setShowImportPanel(false)} />
                   <div className="absolute left-0 top-full mt-1 w-80 bg-white border border-slate-200 rounded-xl shadow-xl z-40 overflow-hidden">
                     <div className="px-3 py-2 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
-                      <p className="text-xs font-semibold text-slate-500">选择导入文件</p>
+                      <p className="text-xs font-semibold text-slate-500">{t('选择导入文件', 'Select imported files')}</p>
                       {selectedImportIds.length > 0 && (
-                        <button onClick={() => setSelectedSources(selectedRegularIds)} className="text-[10px] text-slate-400 hover:text-red-500">清除选择</button>
+                        <button onClick={() => setSelectedSources(selectedRegularIds)} className="text-[10px] text-slate-400 hover:text-red-500">{t('清除选择', 'Clear')}</button>
                       )}
                     </div>
                     <div className="max-h-64 overflow-y-auto">
                       {importBatches.length === 0 ? (
                         <div className="px-4 py-6 text-center">
-                          <p className="text-xs text-slate-400">暂无导入数据</p>
-                          <p className="text-[10px] text-slate-300 mt-1">请在数据源配置中上传文件</p>
+                          <p className="text-xs text-slate-400">{t('暂无导入数据', 'No imported data')}</p>
+                          <p className="text-[10px] text-slate-300 mt-1">{t('请在数据源配置中上传文件', 'Upload files in data-source settings')}</p>
                         </div>
                       ) : (
                         importBatches.map(batch => {
@@ -394,8 +396,8 @@ export default function BrandSelector({ onStartAnalysis, loading, onCancel }: Pr
                             <label key={batch.batch_id} className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer border-b border-slate-50 last:border-0 transition-colors ${isSelected ? 'bg-blue-50' : 'hover:bg-slate-50'}`}>
                               <input type="checkbox" checked={isSelected} onChange={() => toggleImportBatch(batch.batch_id)} className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-slate-700 truncate">{batch.brand || batch.app_name || '导入文件'}</p>
-                                <p className="text-[11px] text-slate-400">{batch.count}条 · {batch.platform || '通用'} · {formatUploadDate(batch.uploaded_at)}</p>
+                                <p className="text-sm font-medium text-slate-700 truncate">{batch.brand || batch.app_name || t('导入文件', 'Imported file')}</p>
+                                <p className="text-[11px] text-slate-400">{t(`${batch.count}条`, `${batch.count} items`)} · {batch.platform || t('通用', 'General')} · {formatUploadDate(batch.uploaded_at)}</p>
                               </div>
                             </label>
                           );
@@ -417,12 +419,12 @@ export default function BrandSelector({ onStartAnalysis, loading, onCancel }: Pr
             className="px-3 py-1.5 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {DATE_RANGES.map(r => (
-              <option key={r.value} value={r.value}>{r.label}</option>
+              <option key={r.value} value={r.value}>{t(`近${r.days}天`, `Last ${r.days} days`)}</option>
             ))}
           </select>
 
           <div className="flex items-center gap-2">
-            <button onClick={onCancel} className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors">取消</button>
+            <button onClick={onCancel} className="px-4 py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors">{t('取消', 'Cancel')}</button>
             <button
               onClick={handleSubmit}
               disabled={!canStart}
@@ -431,9 +433,9 @@ export default function BrandSelector({ onStartAnalysis, loading, onCancel }: Pr
               {loading ? (
                 <span className="inline-flex items-center gap-1.5">
                   <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  分析中...
+                  {t('分析中...', 'Analyzing...')}
                 </span>
-              ) : '开始分析'}
+              ) : t('开始分析', 'Start analysis')}
             </button>
           </div>
         </div>

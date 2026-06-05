@@ -3,20 +3,22 @@
 import { useState } from 'react';
 import type { TopicResult } from '@/lib/types';
 import RefButton from '@/components/layout/RefButton';
+import { useI18n } from '@/lib/i18n';
 
 interface Props {
   data: TopicResult;
   analysisId?: number;
 }
 
-const SENTIMENT_STYLE: Record<string, { bg: string; text: string; label: string }> = {
-  positive: { bg: 'bg-green-50', text: 'text-green-700', label: '正面' },
-  neutral: { bg: 'bg-slate-50', text: 'text-slate-600', label: '中性' },
-  negative: { bg: 'bg-red-50', text: 'text-red-700', label: '负面' },
-  mixed: { bg: 'bg-amber-50', text: 'text-amber-700', label: '混合' },
+const SENTIMENT_STYLE: Record<string, { bg: string; text: string; zh: string; en: string }> = {
+  positive: { bg: 'bg-green-50', text: 'text-green-700', zh: '正面', en: 'Positive' },
+  neutral: { bg: 'bg-slate-50', text: 'text-slate-600', zh: '中性', en: 'Neutral' },
+  negative: { bg: 'bg-red-50', text: 'text-red-700', zh: '负面', en: 'Negative' },
+  mixed: { bg: 'bg-amber-50', text: 'text-amber-700', zh: '混合', en: 'Mixed' },
 };
 
 export default function TopicList({ data, analysisId }: Props) {
+  const { t } = useI18n();
   const maxCount = Math.max(...data.topics.map(t => t.count), 1);
   const totalCount = data.topics.reduce((s, t) => s + t.count, 0);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
@@ -26,13 +28,13 @@ export default function TopicList({ data, analysisId }: Props) {
       <RefButton
         reference={{
           id: `radar-topic-${analysisId}`,
-          label: '主题分布',
+          label: t('主题分布', 'Topics'),
           type: 'radar_topic',
           data: data.topics.map(t => ({ name: t.name, count: t.count, sentiment: t.sentiment, keywords: t.keywords })),
         }}
         className="absolute top-3 right-3 opacity-0 group-hover/card:opacity-100 transition-opacity"
       />
-      <h3 className="text-sm font-semibold text-slate-500 mb-3">主题分布</h3>
+      <h3 className="text-sm font-semibold text-slate-500 mb-3">{t('主题分布', 'Topics')}</h3>
       <div className="space-y-2.5">
         {data.topics.map((topic, idx) => {
           const style = SENTIMENT_STYLE[topic.sentiment] || SENTIMENT_STYLE.neutral;
@@ -50,10 +52,10 @@ export default function TopicList({ data, analysisId }: Props) {
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-slate-700">{topic.name}</span>
                   <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${style.bg} ${style.text}`}>
-                    {style.label}
+                    {t(style.zh, style.en)}
                   </span>
                 </div>
-                <span className="text-xs text-slate-500">{topic.count} 条</span>
+                <span className="text-xs text-slate-500">{t(`${topic.count} 条`, `${topic.count} items`)}</span>
               </div>
               <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
                 <div
@@ -75,14 +77,14 @@ export default function TopicList({ data, analysisId }: Props) {
               {isHovered && (
                 <div className="mt-2 pt-2 border-t border-slate-100 space-y-1.5 animate-in fade-in duration-150">
                   <div className="flex items-center gap-3 text-[11px]">
-                    <span className="text-slate-500">占比 <strong className="text-slate-700">{pct}%</strong></span>
-                    <span className="text-slate-500">提及量 <strong className="text-slate-700">{topic.count}/{totalCount}</strong></span>
-                    <span className={`${style.text}`}>情感倾向：{style.label}</span>
+                    <span className="text-slate-500">{t('占比', 'Share')} <strong className="text-slate-700">{pct}%</strong></span>
+                    <span className="text-slate-500">{t('提及量', 'Mentions')} <strong className="text-slate-700">{topic.count}/{totalCount}</strong></span>
+                    <span className={`${style.text}`}>{t('情感倾向：', 'Sentiment: ')}{t(style.zh, style.en)}</span>
                   </div>
                   {topic.keywords.length > 0 && (
                     <div>
-                      <span className="text-[10px] text-slate-400">关联关键词：</span>
-                      <span className="text-[10px] text-slate-600">{topic.keywords.join('、')}</span>
+                      <span className="text-[10px] text-slate-400">{t('关联关键词：', 'Related keywords: ')}</span>
+                      <span className="text-[10px] text-slate-600">{topic.keywords.join(t('、', ', '))}</span>
                     </div>
                   )}
                 </div>

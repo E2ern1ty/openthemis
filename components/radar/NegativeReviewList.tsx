@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { TopNegative } from '@/lib/types';
 import RefButton from '@/components/layout/RefButton';
+import { useI18n } from '@/lib/i18n';
 
 interface Props {
   data: TopNegative;
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function NegativeReviewList({ data, analysisId }: Props) {
+  const { t } = useI18n();
   const [expandedIdx, setExpandedIdx] = useState<number | null>(null);
 
   return (
@@ -17,13 +19,13 @@ export default function NegativeReviewList({ data, analysisId }: Props) {
       <RefButton
         reference={{
           id: `radar-negative-${analysisId}`,
-          label: '差评洞察',
+          label: t('差评洞察', 'Complaint insights'),
           type: 'radar_negative',
           data: data.items.map(i => ({ summary: i.summary, count: i.count, topic: i.topic, severity: i.severity })),
         }}
         className="absolute top-3 right-3 opacity-0 group-hover/card:opacity-100 transition-opacity"
       />
-      <h3 className="text-sm font-semibold text-slate-500 mb-3">差评 Top{data.items.length}</h3>
+      <h3 className="text-sm font-semibold text-slate-500 mb-3">{t(`差评 Top${data.items.length}`, `Top ${data.items.length} complaints`)}</h3>
       <div className="space-y-2">
         {data.items.map((item, idx) => (
           <div
@@ -46,13 +48,13 @@ export default function NegativeReviewList({ data, analysisId }: Props) {
                           ? 'bg-orange-100 text-orange-700'
                           : 'bg-slate-100 text-slate-500'
                       }`}>
-                        {item.severity}
+                        {item.severity === '系统性缺陷' ? t('系统性缺陷', 'Systemic') : item.severity === '偶发抱怨' ? t('偶发抱怨', 'Occasional') : item.severity}
                       </span>
                     )}
                   </div>
                 </div>
               </div>
-              <span className="text-xs text-red-500 font-medium whitespace-nowrap ml-2">{item.count} 条</span>
+              <span className="text-xs text-red-500 font-medium whitespace-nowrap ml-2">{t(`${item.count} 条`, `${item.count} items`)}</span>
             </div>
             {expandedIdx === idx && (
               <div className="mt-2 pl-5 space-y-1">

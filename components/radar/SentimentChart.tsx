@@ -3,6 +3,7 @@
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import type { SentimentResult } from '@/lib/types';
 import RefButton from '@/components/layout/RefButton';
+import { useI18n } from '@/lib/i18n';
 
 interface Props {
   data: SentimentResult;
@@ -20,11 +21,12 @@ function renderPieLabel(entry: { name?: string; percent?: number }): string {
 }
 
 export default function SentimentChart({ data, analysisId }: Props) {
+  const { t } = useI18n();
   const total = data.positive + data.neutral + data.negative;
   const chartData = [
-    { name: '正面', value: data.positive, color: COLORS.positive },
-    { name: '中性', value: data.neutral, color: COLORS.neutral },
-    { name: '负面', value: data.negative, color: COLORS.negative },
+    { name: t('正面', 'Positive'), value: data.positive, color: COLORS.positive },
+    { name: t('中性', 'Neutral'), value: data.neutral, color: COLORS.neutral },
+    { name: t('负面', 'Negative'), value: data.negative, color: COLORS.negative },
   ];
 
   return (
@@ -32,13 +34,13 @@ export default function SentimentChart({ data, analysisId }: Props) {
       <RefButton
         reference={{
           id: `radar-sentiment-${analysisId}`,
-          label: '情感分布',
+          label: t('情感分布', 'Sentiment'),
           type: 'radar_sentiment',
           data: { positive: data.positive, neutral: data.neutral, negative: data.negative, total },
         }}
         className="absolute top-3 right-3 opacity-0 group-hover/card:opacity-100 transition-opacity"
       />
-      <h3 className="text-sm font-semibold text-slate-500 mb-3">情感分布</h3>
+      <h3 className="text-sm font-semibold text-slate-500 mb-3">{t('情感分布', 'Sentiment')}</h3>
       <div className="h-52" style={{ minWidth: 200 }}>
         <ResponsiveContainer width="100%" height="100%" minWidth={100}>
           <PieChart>
@@ -58,7 +60,7 @@ export default function SentimentChart({ data, analysisId }: Props) {
               ))}
             </Pie>
             <Tooltip
-              formatter={(value, name) => [`${value} 条 (${((Number(value) / total) * 100).toFixed(1)}%)`, String(name)]}
+              formatter={(value, name) => [t(`${value} 条 (${((Number(value) / total) * 100).toFixed(1)}%)`, `${value} items (${((Number(value) / total) * 100).toFixed(1)}%)`), String(name)]}
             />
           </PieChart>
         </ResponsiveContainer>

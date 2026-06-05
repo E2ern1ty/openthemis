@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { AnalysisResult } from '@/lib/types';
 import { useAssistant } from '@/lib/assistant-context';
+import { useI18n } from '@/lib/i18n';
 import BrandSelector from '@/components/radar/BrandSelector';
 import AnalysisProgress from '@/components/radar/AnalysisProgress';
 import OverviewCards from '@/components/radar/OverviewCards';
@@ -27,6 +28,7 @@ type ExtendedResult = AnalysisResult & { researchQuestion?: string; createdAt?: 
 
 export default function RadarPage() {
   const { setPageContext, updatePageSnapshot } = useAssistant();
+  const { t, lang } = useI18n();
   useEffect(() => { setPageContext('radar'); }, [setPageContext]);
 
   const [showNewResearch, setShowNewResearch] = useState(false);
@@ -106,9 +108,9 @@ export default function RadarPage() {
           stopPolling();
           setLoading(false);
           fetchHistory();
-          if (data.status === 'error') setError('分析失败，请重试');
+          if (data.status === 'error') setError(t('分析失败，请重试', 'Analysis failed, please retry'));
         }
-      } catch { stopPolling(); setLoading(false); setError('网络错误'); }
+      } catch { stopPolling(); setLoading(false); setError(t('网络错误', 'Network error')); }
     }, 800);
   }, [stopPolling, fetchHistory]);
 
@@ -161,7 +163,7 @@ export default function RadarPage() {
       });
       pollStatus(resData.id);
     } catch {
-      setError('请求失败，请检查网络');
+      setError(t('请求失败，请检查网络', 'Request failed, please check your network'));
       setLoading(false);
     }
   };
@@ -194,16 +196,16 @@ export default function RadarPage() {
       const res = await fetch(`/api/radar/analyze/${item.id}/retry`, { method: 'POST' });
       if (!res.ok) {
         const data = await res.json();
-        setError(data.error || '重试失败');
+        setError(data.error || t('重试失败', 'Retry failed'));
         setLoading(false);
         return;
       }
       pollStatus(item.id);
-    } catch { setError('重试请求失败'); setLoading(false); }
+    } catch { setError(t('重试请求失败', 'Retry request failed')); setLoading(false); }
   }
 
   function formatDate(d: string) {
-    try { return new Date(d).toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }); }
+    try { return new Date(d).toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-US', { timeZone: 'Asia/Shanghai', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }); }
     catch { return d; }
   }
 
@@ -215,8 +217,8 @@ export default function RadarPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">舆情分析</h1>
-          <p className="text-sm text-slate-500 mt-1">从公开渠道采集舆情，AI 自动研判情感、话题与风险</p>
+          <h1 className="text-xl font-bold text-slate-900">{t('舆情分析', 'Opinion Analysis')}</h1>
+          <p className="text-sm text-slate-500 mt-1">{t('从公开渠道采集舆情，AI 自动研判情感、话题与风险', 'Collect opinion from public channels; AI assesses sentiment, topics and risk')}</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -228,7 +230,7 @@ export default function RadarPage() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
               </svg>
-              新建监测
+              {t('新建监测', 'New monitor')}
             </button>
           )}
 
@@ -241,7 +243,7 @@ export default function RadarPage() {
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
                 </svg>
-                历史记录
+                {t('历史记录', 'History')}
                 <span className="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded-full">{visibleHistory.length}</span>
               </button>
 
@@ -250,7 +252,7 @@ export default function RadarPage() {
                   <div className="fixed inset-0 z-30" onClick={() => setHistoryOpen(false)} />
                   <div className="absolute right-0 top-full mt-1 w-96 bg-white border border-slate-200 rounded-xl shadow-xl z-40 overflow-hidden">
                     <div className="px-3 py-2 border-b border-slate-100 bg-slate-50">
-                      <p className="text-xs font-semibold text-slate-500">监测历史</p>
+                      <p className="text-xs font-semibold text-slate-500">{t('监测历史', 'Monitor history')}</p>
                     </div>
                     <div className="max-h-80 overflow-y-auto">
                       {visibleHistory.map(item => (
@@ -288,17 +290,17 @@ export default function RadarPage() {
                                 </span>
                               )}
                               <span>{formatDate(item.createdAt)}</span>
-                              <span>{item.totalItems ?? 0} 条</span>
+                              <span>{t(`${item.totalItems ?? 0} 条`, `${item.totalItems ?? 0} items`)}</span>
                             </div>
                             <div className="flex items-center gap-1 shrink-0">
                               {item.status === 'error' && (
                                 <button
                                   onClick={(e) => handleRetry(e, item)}
                                   className="text-[10px] text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded-full hover:bg-orange-100 transition-colors"
-                                >重试</button>
+                                >{t('重试', 'Retry')}</button>
                               )}
                               {analysisId === item.id && (
-                                <span className="text-[10px] text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded-full">当前</span>
+                                <span className="text-[10px] text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded-full">{t('当前', 'Current')}</span>
                               )}
                             </div>
                           </div>
@@ -320,7 +322,7 @@ export default function RadarPage() {
             <div className="space-y-2 flex-1 min-w-0">
               {result.researchQuestion && (
                 <div>
-                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">监测主题</span>
+                  <span className="text-[10px] font-medium text-slate-400 uppercase tracking-wider">{t('监测主题', 'Monitor topic')}</span>
                   <p className="text-sm font-medium text-slate-800 mt-0.5">{result.researchQuestion}</p>
                 </div>
               )}
@@ -339,9 +341,9 @@ export default function RadarPage() {
               </div>
               <div className="text-[11px] text-slate-400">
                 {result.createdAt && (
-                  <span>创建于 {formatDate(result.createdAt)} · </span>
+                  <span>{t('创建于', 'Created')} {formatDate(result.createdAt)} · </span>
                 )}
-                数据区间 {result.dateRange.start} ~ {result.dateRange.end} · {result.totalItems} 条数据
+                {t('数据区间', 'Range')} {result.dateRange.start} ~ {result.dateRange.end} · {t(`${result.totalItems} 条数据`, `${result.totalItems} items`)}
               </div>
             </div>
           </div>
@@ -398,9 +400,9 @@ export default function RadarPage() {
             <path d="M12 18h.01" /><path d="M17.99 11.66A6 6 0 0 1 15.77 16.67" />
             <circle cx="12" cy="12" r="2" />
           </svg>
-          <h3 className="text-lg font-semibold text-slate-700">还没有监测记录</h3>
+          <h3 className="text-lg font-semibold text-slate-700">{t('还没有监测记录', 'No monitors yet')}</h3>
           <p className="text-sm text-slate-500 mt-1 mb-4">
-            输入监测主题，AI 自动拆解关键词并从多渠道采集研判舆情
+            {t('输入监测主题，AI 自动拆解关键词并从多渠道采集研判舆情', 'Enter a topic; AI decomposes keywords and collects opinion across channels')}
           </p>
           <button
             onClick={() => setShowNewResearch(true)}
@@ -409,7 +411,7 @@ export default function RadarPage() {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
             </svg>
-            新建第一个监测
+            {t('新建第一个监测', 'Create your first monitor')}
           </button>
         </div>
       )}

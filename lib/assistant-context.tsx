@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
+import { useI18n } from '@/lib/i18n';
 
 export interface Reference {
   id: string;
@@ -57,15 +58,16 @@ const Ctx = createContext<AssistantCtx | null>(null);
 
 const STORAGE_KEY = 'openthemis_assistant';
 
-const PAGE_NAME_MAP: Record<string, string> = {
-  '/': '首页',
-  '/radar': '舆情分析',
-  '/settings': '设置',
+const PAGE_NAME_MAP: Record<string, [string, string]> = {
+  '/': ['首页', 'Home'],
+  '/radar': ['舆情分析', 'Opinion Analysis'],
+  '/settings': ['设置', 'Settings'],
 };
 
-function resolvePageName(pathname: string): string {
-  if (PAGE_NAME_MAP[pathname]) return PAGE_NAME_MAP[pathname];
-  if (pathname.startsWith('/radar/')) return '舆情分析详情';
+function resolvePageName(pathname: string, lang: 'zh' | 'en'): string {
+  const idx = lang === 'zh' ? 0 : 1;
+  if (PAGE_NAME_MAP[pathname]) return PAGE_NAME_MAP[pathname][idx];
+  if (pathname.startsWith('/radar/')) return lang === 'zh' ? '舆情分析详情' : 'Analysis detail';
   return pathname;
 }
 
@@ -86,6 +88,7 @@ function uid() { return `msg_${Date.now()}_${++msgCounter}`; }
 
 export function AssistantProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const { t, lang } = useI18n();
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [references, setReferences] = useState<Reference[]>([]);
   const [open, setOpen] = useState(false);
@@ -96,13 +99,13 @@ export function AssistantProvider({ children }: { children: ReactNode }) {
   const snapshotRef = useRef<PageSnapshot>(pageSnapshot);
 
   useEffect(() => {
-    const name = resolvePageName(pathname);
+    const name = resolvePageName(pathname, lang);
     setPageSnapshot(prev => {
       const next = { ...prev, page: name, path: pathname, data: {} };
       snapshotRef.current = next;
       return next;
     });
-  }, [pathname]);
+  }, [pathname, lang]);
 
   useEffect(() => { setMessages(loadMessages()); }, []);
   useEffect(() => { if (messages.length > 0) saveMessages(messages); }, [messages]);
@@ -174,9 +177,9 @@ export function AssistantProvider({ children }: { children: ReactNode }) {
       });
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: '请求失败' }));
+        const err = await res.json().catch(() => ({ error: t('请求失败', 'Request failed') }));
         setMessages(prev => [...prev, {
-          id: uid(), role: 'assistant', content: err.error || '请求失败', timestamp: Date.now(),
+          id: uid(), role: 'assistant', content: err.error || t('请求失败', 'Request failed'), timestamp: Date.now(),
         }]);
         return;
       }
@@ -194,13 +197,13 @@ export function AssistantProvider({ children }: { children: ReactNode }) {
       }
     } catch {
       setMessages(prev => [...prev, {
-        id: uid(), role: 'assistant', content: '网络错误，请重试', timestamp: Date.now(),
+        id: uid(), role: 'assistant', content: t('网络错误，请重试', 'Network error, please retry'), timestamp: Date.now(),
       }]);
     } finally {
       setLoading(false);
       setReferences([]);
     }
-  }, [loading, messages, references, pageContext, strategyId]);
+  }, [loading, messages, references, pageContext, strategyId, t]);
 
   return (
     <Ctx.Provider value={{

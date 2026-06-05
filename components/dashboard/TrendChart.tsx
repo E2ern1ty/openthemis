@@ -1,6 +1,7 @@
 'use client';
 
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
+import { useI18n } from '@/lib/i18n';
 
 export interface KeywordTrend {
   word: string;
@@ -38,11 +39,18 @@ function fmtHot(v: number): string {
 }
 
 export default function TrendChart({ timeline, trends, selected }: Props) {
-  const shown = trends.filter((t) => selected.includes(t.word));
+  const { t, lang } = useI18n();
+  const shown = trends.filter((tr) => selected.includes(tr.word));
+  const fmtHotL = (v: number) => {
+    if (lang === 'zh') return fmtHot(v);
+    if (v >= 1_000_000) return (v / 1_000_000).toFixed(1) + 'M';
+    if (v >= 1000) return (v / 1000).toFixed(1) + 'K';
+    return String(v);
+  };
 
   // 构造 recharts 数据：每个时间点一行，每个关键词一列
-  const data = timeline.map((t, idx) => {
-    const row: Record<string, number | string | null> = { time: fmtTime(t) };
+  const data = timeline.map((iso, idx) => {
+    const row: Record<string, number | string | null> = { time: fmtTime(iso) };
     for (const tr of shown) {
       const p = tr.series[idx];
       row[tr.word] = p && p.rank !== null ? p.hotValue : null;
@@ -56,8 +64,8 @@ export default function TrendChart({ timeline, trends, selected }: Props) {
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="mb-3">
           <path d="M3 3v18h18" /><path d="M7 14l4-4 4 3 4-6" />
         </svg>
-        <p className="text-sm">趋势需要至少 2 次快照</p>
-        <p className="text-xs mt-1">点击「立即刷新」或开启定时刷新，积累数据后这里会显示关键词热度趋势</p>
+        <p className="text-sm">{t('趋势需要至少 2 次快照', 'Trends need at least 2 snapshots')}</p>
+        <p className="text-xs mt-1">{t('点击「立即刷新」或开启定时刷新，积累数据后这里会显示关键词热度趋势', 'Click "Refresh now" or enable auto-refresh; keyword heat trends appear once data accumulates')}</p>
       </div>
     );
   }
@@ -72,11 +80,11 @@ export default function TrendChart({ timeline, trends, selected }: Props) {
             tick={{ fontSize: 11, fill: '#94a3b8' }}
             tickLine={false}
             axisLine={false}
-            tickFormatter={(v) => fmtHot(Number(v))}
+            tickFormatter={(v) => fmtHotL(Number(v))}
             width={48}
           />
           <Tooltip
-            formatter={(value, name) => [value == null ? '未上榜' : fmtHot(Number(value)), String(name)]}
+            formatter={(value, name) => [value == null ? t('未上榜', 'off list') : fmtHotL(Number(value)), String(name)]}
             contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #e2e8f0' }}
           />
           <Legend wrapperStyle={{ fontSize: 11 }} />

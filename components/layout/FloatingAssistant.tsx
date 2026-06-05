@@ -3,6 +3,7 @@
 import { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAssistant, type Reference } from '@/lib/assistant-context';
+import { useI18n } from '@/lib/i18n';
 
 function RefChip({ ref: r, onRemove }: { ref: Reference; onRemove: () => void }) {
   return (
@@ -13,13 +14,14 @@ function RefChip({ ref: r, onRemove }: { ref: Reference; onRemove: () => void })
   );
 }
 
-const QUICK_QUESTIONS = [
-  '当前页面的数据有什么洞察？',
-  '帮我总结一下关键发现',
-  '有哪些可优化的方向？',
+const QUICK_QUESTIONS: [string, string][] = [
+  ['当前页面的数据有什么洞察？', 'What insights does the current page data show?'],
+  ['帮我总结一下关键发现', 'Summarize the key findings for me'],
+  ['有哪些可优化的方向？', 'What can be improved?'],
 ];
 
 export default function FloatingAssistant() {
+  const { t } = useI18n();
   const {
     messages, references, open, loading, pageSnapshot,
     toggle, sendMessage, removeReference, clearHistory,
@@ -99,7 +101,7 @@ export default function FloatingAssistant() {
                   </svg>
                 </div>
                 <div>
-                  <span className="text-sm font-semibold text-white">舆情助手</span>
+                  <span className="text-sm font-semibold text-white">{t('舆情助手', 'Assistant')}</span>
                   {hasPageData && (
                     <span className="ml-2 px-1.5 py-0.5 text-[9px] bg-white/20 text-white/80 rounded">
                       {pageSnapshot.page}
@@ -112,7 +114,7 @@ export default function FloatingAssistant() {
                   <button
                     onClick={clearHistory}
                     className="p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors"
-                    title="清空对话"
+                    title={t('清空对话', 'Clear conversation')}
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                       <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
@@ -142,21 +144,21 @@ export default function FloatingAssistant() {
                     </svg>
                   </div>
                   <p className="text-sm font-medium text-slate-700">
-                    你好，我是舆情助手
+                    {t('你好，我是舆情助手', 'Hi, I\'m your opinion assistant')}
                   </p>
                   <p className="text-xs text-slate-400 mt-1 mb-4">
                     {hasPageData
-                      ? `已感知「${pageSnapshot.page}」页面数据，可直接提问`
-                      : '可以问我任何舆情分析相关的问题'}
+                      ? t(`已感知「${pageSnapshot.page}」页面数据，可直接提问`, `I'm aware of the "${pageSnapshot.page}" page data — ask away`)
+                      : t('可以问我任何舆情分析相关的问题', 'Ask me anything about opinion analysis')}
                   </p>
                   <div className="space-y-1.5">
                     {QUICK_QUESTIONS.map(q => (
                       <button
-                        key={q}
-                        onClick={() => sendMessage(q)}
+                        key={q[0]}
+                        onClick={() => sendMessage(t(q[0], q[1]))}
                         className="block w-full text-left text-xs text-blue-600 bg-blue-50/60 hover:bg-blue-50 px-3 py-2 rounded-lg transition-colors"
                       >
-                        {q}
+                        {t(q[0], q[1])}
                       </button>
                     ))}
                   </div>
@@ -184,14 +186,14 @@ export default function FloatingAssistant() {
                     </div>
                     {msg.modified && (
                       <span className="inline-block mt-1 text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
-                        策略已更新
+                        {t('策略已更新', 'Strategy updated')}
                       </span>
                     )}
                     {msg.role === 'assistant' && msg.confidence && msg.confidence !== 'high' && (
                       <span className={`inline-block mt-1 text-[10px] ${
                         msg.confidence === 'medium' ? 'text-amber-500' : 'text-red-400'
                       }`}>
-                        {msg.confidence === 'medium' ? '置信度中' : '置信度低'}
+                        {msg.confidence === 'medium' ? t('置信度中', 'Medium confidence') : t('置信度低', 'Low confidence')}
                       </span>
                     )}
                   </div>
@@ -226,7 +228,7 @@ export default function FloatingAssistant() {
                 ref={inputRef}
                 type="text"
                 onKeyDown={handleKeyDown}
-                placeholder={hasPageData ? `基于「${pageSnapshot.page}」数据提问...` : '问我任何舆情问题...'}
+                placeholder={hasPageData ? t(`基于「${pageSnapshot.page}」数据提问...`, `Ask about "${pageSnapshot.page}" data...`) : t('问我任何舆情问题...', 'Ask me anything about opinion...')}
                 className="flex-1 text-sm text-slate-900 placeholder:text-slate-400 border-none outline-none bg-transparent"
                 disabled={loading}
               />

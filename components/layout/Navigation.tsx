@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { clsx } from 'clsx';
+import { useI18n } from '@/lib/i18n';
 
 function IconRadar({ className }: { className?: string }) {
   return (
@@ -26,12 +27,13 @@ function IconDashboard({ className }: { className?: string }) {
 }
 
 const tabs = [
-  { name: '看板', href: '/dashboard', icon: IconDashboard },
-  { name: '舆情分析', href: '/radar', icon: IconRadar },
+  { name_zh: '看板', name_en: 'Dashboard', href: '/dashboard', icon: IconDashboard },
+  { name_zh: '舆情分析', name_en: 'Analysis', href: '/radar', icon: IconRadar },
 ];
 
 export default function Navigation() {
   const pathname = usePathname();
+  const { t, lang, toggle } = useI18n();
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-slate-200">
@@ -57,27 +59,41 @@ export default function Navigation() {
                       : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50',
                   )}
                 >
-                  <Icon /> {tab.name}
+                  <Icon /> {t(tab.name_zh, tab.name_en)}
                 </Link>
               );
             })}
           </nav>
 
-          <Link
-            href="/settings"
-            className={clsx(
-              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
-              pathname.startsWith('/settings')
-                ? 'bg-slate-100 text-slate-900'
-                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50',
-            )}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-            设置
-          </Link>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={toggle}
+              title={lang === 'zh' ? 'Switch to English' : '切换为中文'}
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-sm font-medium text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" /><path d="M2 12h20" />
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+              </svg>
+              {lang === 'zh' ? 'EN' : '中'}
+            </button>
+
+            <Link
+              href="/settings"
+              className={clsx(
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+                pathname.startsWith('/settings')
+                  ? 'bg-slate-100 text-slate-900'
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50',
+              )}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              {t('设置', 'Settings')}
+            </Link>
+          </div>
         </div>
       </div>
     </header>

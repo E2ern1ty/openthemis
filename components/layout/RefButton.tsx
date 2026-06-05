@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useAssistant, type Reference } from '@/lib/assistant-context';
+import { useI18n } from '@/lib/i18n';
 
 interface Props {
   reference: Omit<Reference, 'addedAt'>;
@@ -11,6 +12,7 @@ interface Props {
 
 export default function RefButton({ reference, className = '', size = 'sm' }: Props) {
   const { addReference } = useAssistant();
+  const { t } = useI18n();
   const [added, setAdded] = useState(false);
 
   function handleClick(e: React.MouseEvent) {
@@ -27,7 +29,7 @@ export default function RefButton({ reference, className = '', size = 'sm' }: Pr
   return (
     <button
       onClick={handleClick}
-      title={`引用「${reference.label}」到助手`}
+      title={t(`引用「${reference.label}」到助手`, `Reference "${reference.label}" to assistant`)}
       className={`inline-flex items-center justify-center rounded-md border transition-all duration-200 ${
         added
           ? 'bg-emerald-50 border-emerald-200 text-emerald-600'

@@ -36,22 +36,22 @@ A **page-aware AI assistant** is also available globally, answering questions in
 ### Home · Live opinion overview
 On startup, randomly pulls trending topics from Weibo / Reddit and shows live sentiment distribution, hot topics, and risk assessment (source switchable).
 
-<p align="center"><img src="docs/screenshots/01-home.png" width="820" alt="Home" /></p>
+<p align="center"><img src="docs/screenshots/en/01-home.png" width="820" alt="Home" /></p>
 
 ### Dashboard · Scheduled refresh + topic-keyword trends
 Switch between Weibo / Reddit sources, with 30s / 1 / 5 / 10-minute scheduled refresh, a line chart of keyword heat over time, plus sentiment distribution, category distribution, and a live trending list.
 
-<p align="center"><img src="docs/screenshots/02-dashboard.png" width="820" alt="Dashboard" /></p>
+<p align="center"><img src="docs/screenshots/en/02-dashboard.png" width="820" alt="Dashboard" /></p>
 
 ### Analysis · Multi-channel collection & assessment
 Enter a monitoring topic; the AI decomposes it into keywords, collects across channels, and outputs sentiment, topics, negative-signal mining, and assessment.
 
-<p align="center"><img src="docs/screenshots/03-radar.png" width="820" alt="Analysis" /></p>
+<p align="center"><img src="docs/screenshots/en/03-radar.png" width="820" alt="Analysis" /></p>
 
 ### Settings · LLM config (OpenAI-compatible)
 All built-in analysis runs through a visually configured, OpenAI-compatible LLM, with hot-reload and a connection test.
 
-<p align="center"><img src="docs/screenshots/04-settings.png" width="820" alt="Settings" /></p>
+<p align="center"><img src="docs/screenshots/en/04-settings.png" width="820" alt="Settings" /></p>
 
 ## 4. Architecture (3 layers, independently deployable/replaceable)
 

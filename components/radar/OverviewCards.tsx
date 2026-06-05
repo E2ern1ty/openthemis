@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import type { AnalysisResult } from '@/lib/types';
 import RefButton from '@/components/layout/RefButton';
+import { useI18n } from '@/lib/i18n';
 
 interface Props {
   data: AnalysisResult;
@@ -15,16 +16,25 @@ function normalizeSource(raw: string): string {
   return raw;
 }
 
+const SOURCE_EN: Record<string, string> = {
+  '小红书': 'Xiaohongshu',
+  '导入数据': 'Imported',
+  '微博': 'Weibo',
+};
+
 export default function OverviewCards({ data }: Props) {
+  const { t, lang } = useI18n();
   const normalizedSources = useMemo(
     () => [...new Set(data.sources.map(normalizeSource))],
     [data.sources],
   );
 
+  const localizeSource = (s: string) => (lang === 'zh' ? s : (SOURCE_EN[s] || s));
+
   const stats = [
-    { label: '搜索词', value: data.brands.length, color: 'text-blue-600' },
-    { label: '数据量', value: data.totalItems, color: 'text-indigo-600' },
-    { label: '数据来源', value: normalizedSources.length, color: 'text-purple-600' },
+    { label: t('搜索词', 'Keywords'), value: data.brands.length, color: 'text-blue-600' },
+    { label: t('数据量', 'Items'), value: data.totalItems, color: 'text-indigo-600' },
+    { label: t('数据来源', 'Sources'), value: normalizedSources.length, color: 'text-purple-600' },
   ];
 
   return (
@@ -32,13 +42,13 @@ export default function OverviewCards({ data }: Props) {
       <RefButton
         reference={{
           id: `radar-overview-${data.id}`,
-          label: '数据总览',
+          label: t('数据总览', 'Overview'),
           type: 'radar_overview',
           data: { brands: data.brands, totalItems: data.totalItems, sources: normalizedSources, dateRange: data.dateRange },
         }}
         className="absolute top-3 right-3 opacity-0 group-hover/card:opacity-100 transition-opacity"
       />
-      <h3 className="text-sm font-semibold text-slate-500 mb-3">数据总览</h3>
+      <h3 className="text-sm font-semibold text-slate-500 mb-3">{t('数据总览', 'Overview')}</h3>
       <div className="grid grid-cols-3 gap-4">
         {stats.map(s => (
           <div key={s.label} className="text-center">
@@ -49,11 +59,11 @@ export default function OverviewCards({ data }: Props) {
       </div>
       <div className="mt-3 pt-3 border-t border-slate-100">
         <div className="flex items-center gap-2 text-xs text-slate-500">
-          <span>时间范围：{data.dateRange.start} ~ {data.dateRange.end}</span>
+          <span>{t('时间范围：', 'Range: ')}{data.dateRange.start} ~ {data.dateRange.end}</span>
         </div>
         <div className="flex flex-wrap gap-1.5 mt-2">
           {normalizedSources.map(s => (
-            <span key={s} className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs">{s}</span>
+            <span key={s} className="px-2 py-0.5 bg-slate-100 text-slate-600 rounded text-xs">{localizeSource(s)}</span>
           ))}
         </div>
       </div>

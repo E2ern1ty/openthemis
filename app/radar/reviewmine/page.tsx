@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import { useI18n } from '@/lib/i18n';
 
 interface BatchInfo {
   batch_id: string;
@@ -18,6 +19,7 @@ function getStartPage() {
 }
 
 export default function ReviewMinePage() {
+  const { t, lang } = useI18n();
   const [activeTab, setActiveTab] = useState<'browse' | 'upload'>('browse');
   const [batches, setBatches] = useState<BatchInfo[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -85,9 +87,9 @@ export default function ReviewMinePage() {
     try {
       const res = await fetch('/api/radar/upload-reviews', { method: 'POST', body: fd });
       const data = await res.json();
-      if (!res.ok) setUploadError(data.error || '上传失败');
+      if (!res.ok) setUploadError(data.error || t('上传失败', 'Upload failed'));
       else { setUploadResult({ total: data.total, batch_id: data.batch_id }); fetchBatches(); }
-    } catch { setUploadError('网络错误'); }
+    } catch { setUploadError(t('网络错误', 'Network error')); }
     setUploading(false);
   }
 
@@ -119,9 +121,9 @@ export default function ReviewMinePage() {
             </svg>
           </Link>
           <div>
-            <h1 className="text-xl font-bold text-slate-900">App Store 评价采集</h1>
+            <h1 className="text-xl font-bold text-slate-900">{t('App Store 评价采集', 'App Store review collection')}</h1>
             <p className="text-sm text-slate-500 mt-0.5">
-              通过 ReviewMine 采集应用商店评论，导出后导入雷达分析
+              {t('通过 ReviewMine 采集应用商店评论，导出后导入雷达分析', 'Collect app store reviews via ReviewMine, then import them for analysis')}
             </p>
           </div>
         </div>
@@ -130,14 +132,14 @@ export default function ReviewMinePage() {
             <>
               <span className="flex items-center gap-1.5 text-xs text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                已登录
+                {t('已登录', 'Logged in')}
               </span>
               <button onClick={clearToken} className="text-xs text-slate-400 hover:text-red-500 transition-colors">
-                退出
+                {t('退出', 'Sign out')}
               </button>
             </>
           ) : (
-            <span className="text-xs text-slate-400">未登录</span>
+            <span className="text-xs text-slate-400">{t('未登录', 'Not logged in')}</span>
           )}
         </div>
       </div>
@@ -167,7 +169,7 @@ export default function ReviewMinePage() {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
             </svg>
-            导入 Excel
+            {t('导入 Excel', 'Import Excel')}
             {batches.length > 0 && (
               <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded-full">{batches.length}</span>
             )}
@@ -187,10 +189,9 @@ export default function ReviewMinePage() {
                 </svg>
                 <div className="flex-1 space-y-3">
                   <div>
-                    <p className="text-sm font-medium text-amber-800">配置 ReviewMine Token</p>
+                    <p className="text-sm font-medium text-amber-800">{t('配置 ReviewMine Token', 'Configure ReviewMine token')}</p>
                     <p className="text-xs text-amber-700 mt-1">
-                      请提供 ReviewMine 的 <code className="bg-amber-100 px-1 rounded">auth_token</code>，
-                      系统将通过后端代理访问 ReviewMine，无需在 iframe 内登录。
+                      {t('请提供 ReviewMine 的', 'Please provide ReviewMine\'s')} <code className="bg-amber-100 px-1 rounded">auth_token</code>{t('，系统将通过后端代理访问 ReviewMine，无需在 iframe 内登录。', '. The system accesses ReviewMine through a backend proxy — no login inside the iframe needed.')}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -198,7 +199,7 @@ export default function ReviewMinePage() {
                       value={tokenInput}
                       onChange={e => setTokenInput(e.target.value)}
                       onKeyDown={e => e.key === 'Enter' && saveToken()}
-                      placeholder="粘贴 auth_token（eyJ...）"
+                      placeholder={t('粘贴 auth_token（eyJ...）', 'Paste auth_token (eyJ...)')}
                       className="flex-1 px-3 py-2 text-xs font-mono border border-amber-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-amber-400"
                     />
                     <button
@@ -206,7 +207,7 @@ export default function ReviewMinePage() {
                       disabled={!tokenInput.trim() || savingToken}
                       className="px-4 py-2 text-sm font-medium bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:opacity-40 transition-colors whitespace-nowrap"
                     >
-                      {savingToken ? '验证中...' : '保存'}
+                      {savingToken ? t('验证中...', 'Verifying...') : t('保存', 'Save')}
                     </button>
                   </div>
                 </div>
@@ -230,7 +231,7 @@ export default function ReviewMinePage() {
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
                     </svg>
-                    刷新
+                    {t('刷新', 'Refresh')}
                   </button>
                   <a
                     href="https://reviewmine.app/app-selection"
@@ -238,7 +239,7 @@ export default function ReviewMinePage() {
                     rel="noopener noreferrer"
                     className="text-xs text-blue-500 hover:text-blue-700 transition-colors flex items-center gap-1"
                   >
-                    新窗口
+                    {t('新窗口', 'New window')}
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                   </a>
                 </div>
@@ -251,7 +252,8 @@ export default function ReviewMinePage() {
               />
               <div className="px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 border-t border-slate-200">
                 <p className="text-xs text-slate-600">
-                  在上方操作 ReviewMine：搜索 App &rarr; 查看分析 &rarr; 导出 Excel &rarr; 切换「导入 Excel」标签上传，即可加入舆情分析。
+                  {t('在上方操作 ReviewMine：搜索 App → 查看分析 → 导出 Excel → 切换「导入 Excel」标签上传，即可加入舆情分析。',
+                     'Use ReviewMine above: search an app → view analysis → export Excel → switch to the "Import Excel" tab to upload, and it joins the opinion analysis.')}
                 </p>
               </div>
             </div>
@@ -262,8 +264,8 @@ export default function ReviewMinePage() {
               <svg className="mx-auto mb-3 text-slate-200" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
               </svg>
-              <h3 className="text-base font-semibold text-slate-600">配置 Token 后即可在此操作 ReviewMine</h3>
-              <p className="text-sm text-slate-400 mt-1">也可以直接在「导入 Excel」标签页上传已有文件</p>
+              <h3 className="text-base font-semibold text-slate-600">{t('配置 Token 后即可在此操作 ReviewMine', 'Configure a token to use ReviewMine here')}</h3>
+              <p className="text-sm text-slate-400 mt-1">{t('也可以直接在「导入 Excel」标签页上传已有文件', 'Or upload an existing file directly in the "Import Excel" tab')}</p>
             </div>
           )}
         </div>
@@ -277,10 +279,10 @@ export default function ReviewMinePage() {
               <input
                 value={brand}
                 onChange={e => setBrand(e.target.value)}
-                placeholder="关联品牌名称（可选，如：哈啰出行）"
+                placeholder={t('关联品牌名称（可选）', 'Linked brand name (optional)')}
                 className="flex-1 max-w-xs px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <span className="text-xs text-slate-400">指定后将自动关联到该品牌的雷达分析</span>
+              <span className="text-xs text-slate-400">{t('指定后将自动关联到该品牌的雷达分析', 'When set, results auto-link to this brand\'s analysis')}</span>
             </div>
 
             <div
@@ -296,15 +298,15 @@ export default function ReviewMinePage() {
               {uploading ? (
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-8 h-8 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" />
-                  <p className="text-sm text-slate-600">正在解析文件...</p>
+                  <p className="text-sm text-slate-600">{t('正在解析文件...', 'Parsing file...')}</p>
                 </div>
               ) : (
                 <>
                   <svg className="mx-auto mb-3 text-slate-300" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
                   </svg>
-                  <p className="text-sm font-medium text-slate-700">拖拽 Excel 文件到此处，或点击选择</p>
-                  <p className="text-xs text-slate-400 mt-1">支持 .xlsx / .xls / .csv，自动识别列映射</p>
+                  <p className="text-sm font-medium text-slate-700">{t('拖拽 Excel 文件到此处，或点击选择', 'Drag an Excel file here, or click to select')}</p>
+                  <p className="text-xs text-slate-400 mt-1">{t('支持 .xlsx / .xls / .csv，自动识别列映射', 'Supports .xlsx / .xls / .csv with auto column mapping')}</p>
                 </>
               )}
             </div>
@@ -317,8 +319,7 @@ export default function ReviewMinePage() {
             {uploadResult && (
               <div className="mt-3 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-lg">
                 <p className="text-sm text-emerald-700">
-                  成功导入 <strong>{uploadResult.total}</strong> 条评论。
-                  在舆情分析中选择「App Store 评价」数据源即可参与分析。
+                  {t('成功导入', 'Imported')} <strong>{uploadResult.total}</strong> {t('条评论。在舆情分析中选择「App Store 评价」数据源即可参与分析。', 'reviews. Select the "App Store reviews" data source in analysis to include them.')}
                 </p>
               </div>
             )}
@@ -327,7 +328,7 @@ export default function ReviewMinePage() {
           {batches.length > 0 && (
             <div className="card">
               <div className="px-4 py-3 border-b border-slate-100">
-                <h3 className="text-sm font-semibold text-slate-700">已导入的数据批次</h3>
+                <h3 className="text-sm font-semibold text-slate-700">{t('已导入的数据批次', 'Imported data batches')}</h3>
               </div>
               <div className="divide-y divide-slate-100">
                 {batches.map(b => (
@@ -340,11 +341,11 @@ export default function ReviewMinePage() {
                       </div>
                       <div>
                         <p className="text-sm font-medium text-slate-700">
-                          {b.app_name || b.brand || '未知应用'}
+                          {b.app_name || b.brand || t('未知应用', 'Unknown app')}
                           <span className="ml-2 text-xs text-slate-400">{b.platform}</span>
                         </p>
                         <p className="text-xs text-slate-400">
-                          {b.count} 条评论 &middot; {new Date(b.uploaded_at).toLocaleString('zh-CN')}
+                          {t(`${b.count} 条评论`, `${b.count} reviews`)} &middot; {new Date(b.uploaded_at).toLocaleString(lang === 'zh' ? 'zh-CN' : 'en-US')}
                         </p>
                       </div>
                     </div>
