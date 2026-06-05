@@ -16,8 +16,8 @@ const STRIP_HEADERS = [
   'content-security-policy-report-only',
 ];
 
-async function proxyRequest(request: NextRequest, params: { path: string[] }) {
-  const resolvedParams = await Promise.resolve(params);
+async function proxyRequest(request: NextRequest, params: Promise<{ path: string[] }>) {
+  const resolvedParams = await params;
   const targetPath = '/' + resolvedParams.path.join('/');
   const url = new URL(request.url);
 
@@ -159,18 +159,18 @@ function rewriteHtml(html: string, token: string): string {
   return html;
 }
 
-export async function GET(req: NextRequest, ctx: { params: { path: string[] } }) {
+export async function GET(req: NextRequest, ctx: { params: Promise<{ path: string[] }> }) {
   return proxyRequest(req, ctx.params);
 }
-export async function POST(req: NextRequest, ctx: { params: { path: string[] } }) {
+export async function POST(req: NextRequest, ctx: { params: Promise<{ path: string[] }> }) {
   return proxyRequest(req, ctx.params);
 }
-export async function PUT(req: NextRequest, ctx: { params: { path: string[] } }) {
+export async function PUT(req: NextRequest, ctx: { params: Promise<{ path: string[] }> }) {
   return proxyRequest(req, ctx.params);
 }
-export async function PATCH(req: NextRequest, ctx: { params: { path: string[] } }) {
+export async function PATCH(req: NextRequest, ctx: { params: Promise<{ path: string[] }> }) {
   return proxyRequest(req, ctx.params);
 }
-export async function DELETE(req: NextRequest, ctx: { params: { path: string[] } }) {
+export async function DELETE(req: NextRequest, ctx: { params: Promise<{ path: string[] }> }) {
   return proxyRequest(req, ctx.params);
 }

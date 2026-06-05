@@ -1,6 +1,6 @@
 {
   "name": "openthemis-collector",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "description": "OpenThemis 采集层 — 独立运行的只读采集网关，所有渠道统一通过 OpenCLI 接入",

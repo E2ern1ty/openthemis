@@ -11,8 +11,8 @@ export async function GET() {
   const list = rows.map(r => ({
     id: r.id,
     brands: JSON.parse(r.brands),
-    ownBrand: (r as Record<string, unknown>).own_brand || '',
-    researchQuestion: (r as Record<string, unknown>).research_question || '',
+    ownBrand: r.own_brand || '',
+    researchQuestion: r.research_question || '',
     dateRange: JSON.parse(r.date_range),
     status: r.status,
     progress: r.progress,

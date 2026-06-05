@@ -25,6 +25,7 @@ export interface Analysis {
   id: number;
   brands: string;
   own_brand: string;
+  research_question: string;
   date_range: string;
   status: 'pending' | 'processing' | 'completed' | 'error';
   progress: number;

@@ -33,7 +33,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     progress: analysis.progress,
     brands: JSON.parse(analysis.brands),
     ownBrand: analysis.own_brand || undefined,
-    researchQuestion: (analysis as Record<string, unknown>).research_question as string || '',
+    researchQuestion: analysis.research_question || '',
     createdAt,
     dateRange: JSON.parse(analysis.date_range),
     totalItems: analysis.total_items,
