@@ -24,12 +24,12 @@ A **page-aware AI assistant** is also available globally, answering questions in
 ## 3. Screenshots
 
 ### Home · Live opinion overview
-On startup, randomly pulls trending topics from Weibo and shows live sentiment distribution, hot topics, and risk assessment.
+On startup, randomly pulls trending topics from Weibo / Reddit and shows live sentiment distribution, hot topics, and risk assessment (source switchable).
 
 <p align="center"><img src="docs/screenshots/01-home.png" width="820" alt="Home" /></p>
 
 ### Dashboard · Scheduled refresh + topic-keyword trends
-Supports 30s / 1 / 5 / 10-minute scheduled refresh, with a line chart of keyword heat over time, plus sentiment distribution, category distribution, and a live trending list.
+Switch between Weibo / Reddit sources, with 30s / 1 / 5 / 10-minute scheduled refresh, a line chart of keyword heat over time, plus sentiment distribution, category distribution, and a live trending list.
 
 <p align="center"><img src="docs/screenshots/02-dashboard.png" width="820" alt="Dashboard" /></p>
 

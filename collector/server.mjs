@@ -4,7 +4,8 @@ import {
   searchChannel,
   probeChannelLogin,
   checkOpenCliAvailable,
-  fetchWeiboHot,
+  fetchHot,
+  listHotChannels,
   AuthRequiredError,
 } from './opencli.mjs';
 
@@ -66,11 +67,20 @@ const server = http.createServer(async (req, res) => {
       return send(res, 200, { channels: listChannels() });
     }
 
-    // GET /weibo/hot?limit=50  微博热搜话题
-    if (method === 'GET' && pathname === '/weibo/hot') {
+    // GET /hot?channel=weibo|reddit&limit=50  实时热门话题
+    if (method === 'GET' && (pathname === '/hot' || pathname === '/weibo/hot')) {
       const limit = Math.min(Number(url.searchParams.get('limit')) || 50, 50);
-      const topics = await fetchWeiboHot(limit);
-      return send(res, 200, { topics, total: topics.length });
+      // /weibo/hot 向后兼容；/hot 支持 channel 参数（默认 weibo）
+      const channel = pathname === '/weibo/hot'
+        ? 'weibo'
+        : (url.searchParams.get('channel') || 'weibo');
+      const topics = await fetchHot(channel, limit);
+      return send(res, 200, { channel, topics, total: topics.length });
+    }
+
+    // GET /hot/channels  支持实时热门的渠道列表
+    if (method === 'GET' && pathname === '/hot/channels') {
+      return send(res, 200, { channels: listHotChannels() });
     }
 
     // GET /channels/:id/status

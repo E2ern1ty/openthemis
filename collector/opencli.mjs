@@ -143,34 +143,70 @@ export async function checkOpenCliAvailable() {
 }
 
 /**
- * 拉取微博热搜话题（opencli weibo hot）。
- * 返回归一化的话题列表：{ rank, word, category, label, hotValue, url }
- * weibo hot 是公开接口，通常无需登录即可获取。
+ * 各「实时热门」来源的命令与归一化映射。
+ * 统一输出 { rank, word, category, label, hotValue, url }。
  */
-export async function fetchWeiboHot(limit = 50) {
-  const args = ['weibo', 'hot', '--limit', String(limit), '-f', 'json'];
-  console.log(`[Collector] opencli ${args.join(' ')}`);
-  const { code, stdout, stderr } = await runOpenCli(args, { timeout: 90_000 });
-
-  if (code === EXIT_AUTH_REQUIRED || /AUTH_REQUIRED/.test(stderr)) {
-    throw new AuthRequiredError('请在 Chrome 中登录微博后重试', 'https://weibo.com');
-  }
-  if (code !== 0) {
-    throw new Error(`opencli weibo hot failed (code ${code}): ${stderr.slice(-300)}`);
-  }
-
-  const rows = parseJsonOutput(stdout);
-  const topics = (Array.isArray(rows) ? rows : [])
-    .map((row) => ({
-      rank: Number(row.rank) || 0,
+const HOT_SOURCES = {
+  weibo: {
+    loginUrl: 'https://weibo.com',
+    args: (limit) => ['weibo', 'hot', '--limit', String(limit), '-f', 'json'],
+    map: (row, idx) => ({
+      rank: Number(row.rank) || idx + 1,
       word: String(row.word || row.title || '').trim(),
       category: String(row.category || '').trim(),
       label: String(row.label || '').trim(),
       hotValue: Number(row.hot_value ?? row.hotValue ?? 0) || 0,
       url: String(row.url || ''),
-    }))
+    }),
+  },
+  reddit: {
+    loginUrl: 'https://www.reddit.com',
+    // reddit popular（/r/popular）通常免登录
+    args: (limit) => ['reddit', 'popular', '--limit', String(limit), '-f', 'json'],
+    map: (row, idx) => ({
+      rank: Number(row.rank) || idx + 1,
+      word: String(row.title || '').trim(),
+      category: String(row.subreddit || '').replace(/^r\//, '').trim(),
+      label: '',
+      hotValue: Number(row.score) || 0,
+      url: String(row.url || ''),
+    }),
+  },
+};
+
+export function listHotChannels() {
+  return Object.keys(HOT_SOURCES);
+}
+
+/**
+ * 拉取某渠道的实时热门话题。默认 weibo；reddit 免登录。
+ * 返回归一化的话题列表：{ rank, word, category, label, hotValue, url }
+ */
+export async function fetchHot(channel = 'weibo', limit = 50) {
+  const src = HOT_SOURCES[channel];
+  if (!src) throw new Error(`unsupported hot channel: ${channel}`);
+
+  const args = src.args(limit);
+  console.log(`[Collector] opencli ${args.join(' ')}`);
+  const { code, stdout, stderr } = await runOpenCli(args, { timeout: 90_000 });
+
+  if (code === EXIT_AUTH_REQUIRED || /AUTH_REQUIRED/.test(stderr)) {
+    throw new AuthRequiredError(`请在 Chrome 中登录后重试`, src.loginUrl);
+  }
+  if (code !== 0) {
+    throw new Error(`opencli ${channel} hot failed (code ${code}): ${stderr.slice(-300)}`);
+  }
+
+  const rows = parseJsonOutput(stdout);
+  const topics = (Array.isArray(rows) ? rows : [])
+    .map((row, idx) => src.map(row, idx))
     .filter((t) => t.word.length > 0);
 
-  console.log(`[Collector] weibo hot: ${topics.length} topics`);
+  console.log(`[Collector] ${channel} hot: ${topics.length} topics`);
   return topics;
+}
+
+// 向后兼容旧调用
+export function fetchWeiboHot(limit = 50) {
+  return fetchHot('weibo', limit);
 }

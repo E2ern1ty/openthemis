@@ -82,17 +82,24 @@ function pct(n: number, total: number): number {
   return total > 0 ? Math.round((n / total) * 100) : 0;
 }
 
+const HOT_SOURCES = [
+  { id: 'weibo', label: '微博' },
+  { id: 'reddit', label: 'Reddit' },
+] as const;
+
 function HeroDashboard() {
+  const [channel, setChannel] = useState<string>('weibo');
   const [feed, setFeed] = useState<HomeFeed | null>(null);
 
   useEffect(() => {
     let alive = true;
-    fetch('/api/home-feed')
+    setFeed(null);
+    fetch(`/api/home-feed?channel=${channel}`)
       .then(r => r.json())
       .then((data: HomeFeed) => { if (alive) setFeed(data); })
       .catch(() => { /* keep skeleton */ });
     return () => { alive = false; };
-  }, []);
+  }, [channel]);
 
   const loading = !feed;
   const total = feed?.sampled ?? 0;
@@ -119,6 +126,20 @@ function HeroDashboard() {
             <div className="w-2.5 h-2.5 rounded-full bg-stone-200" />
           </div>
           <span className="text-[11px] text-stone-400 ml-2 font-medium">OpenThemis — 监测工作台</span>
+          {/* 实时数据源切换 */}
+          <div className="ml-auto flex items-center gap-0.5 bg-stone-100 rounded-md p-0.5">
+            {HOT_SOURCES.map(src => (
+              <button
+                key={src.id}
+                onClick={() => setChannel(src.id)}
+                className={`text-[10px] px-2 py-0.5 rounded transition-colors ${
+                  channel === src.id ? 'bg-white text-stone-700 shadow-sm font-medium' : 'text-stone-400 hover:text-stone-600'
+                }`}
+              >
+                {src.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="p-5 space-y-4">
@@ -127,18 +148,18 @@ function HeroDashboard() {
             <div className="flex items-center gap-2">
               <div className={`w-1.5 h-1.5 rounded-full ${feed?.live ? 'bg-red-500' : 'bg-stone-400'} animate-pulse`} />
               <span className="text-[11px] font-semibold text-stone-600">
-                {feed?.live ? '微博热搜 · 实时采集' : '舆情采集'}
+                {feed?.live ? `${feed.source} · 实时采集` : '舆情采集'}
               </span>
               <span className="text-[10px] text-stone-400 ml-auto">
                 {loading ? '加载中…' : `${total} 条舆论`}
               </span>
             </div>
             <div className="rounded-lg border border-red-100 bg-red-50/60 px-3 py-2 flex items-center gap-2">
-              <span className="text-[10px] font-medium text-red-600 shrink-0">微博</span>
+              <span className="text-[10px] font-medium text-red-600 shrink-0">{HOT_SOURCES.find(s => s.id === channel)?.label || channel}</span>
               <div className="flex-1 overflow-hidden">
                 <div className="text-[11px] text-stone-600 truncate">
                   {loading
-                    ? '正在从微博渠道随机捞取舆论…'
+                    ? '正在随机捞取舆论…'
                     : topTopics[0]
                       ? `# ${topTopics[0].word}`
                       : '暂无实时数据'}

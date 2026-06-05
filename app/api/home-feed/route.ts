@@ -18,9 +18,18 @@ interface HotTopic {
   url: string;
 }
 
-// 进程级缓存：启动后只拉取一次
-let cached: HomeFeed | null = null;
-let inflight: Promise<HomeFeed> | null = null;
+// 进程级缓存：每个渠道启动后只拉取一次
+const cached: Map<string, HomeFeed> = new Map();
+const inflight: Map<string, Promise<HomeFeed>> = new Map();
+
+// 支持作为首页实时源的渠道（与采集层 /hot/channels 对应）
+const HOT_CHANNELS: Record<string, string> = {
+  weibo: '微博热搜',
+  reddit: 'Reddit 热门',
+};
+function sourceLabel(channel: string): string {
+  return HOT_CHANNELS[channel] || channel;
+}
 
 function collectorBase(): string {
   return (process.env.COLLECTOR_URL || 'http://localhost:4001').replace(/\/$/, '');
@@ -88,11 +97,11 @@ function fallbackFeed(): HomeFeed {
   return buildFeed(demo, false, 'demo');
 }
 
-async function fetchFeed(): Promise<HomeFeed> {
+async function fetchFeed(channel: string): Promise<HomeFeed> {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 90_000);
-    const res = await fetch(`${collectorBase()}/weibo/hot?limit=50`, {
+    const res = await fetch(`${collectorBase()}/hot?channel=${encodeURIComponent(channel)}&limit=50`, {
       headers: authHeaders(),
       signal: controller.signal,
     });
@@ -102,7 +111,7 @@ async function fetchFeed(): Promise<HomeFeed> {
     if (!res.ok || topics.length === 0) {
       return fallbackFeed();
     }
-    return buildFeed(topics, true, '微博热搜');
+    return buildFeed(topics, true, sourceLabel(channel));
   } catch {
     return fallbackFeed();
   }
@@ -111,17 +120,19 @@ async function fetchFeed(): Promise<HomeFeed> {
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const refresh = url.searchParams.get('refresh') === '1';
+  const channel = url.searchParams.get('channel') || 'weibo';
 
-  if (cached && !refresh) {
-    return Response.json(cached);
+  const hit = cached.get(channel);
+  if (hit && !refresh) {
+    return Response.json(hit);
   }
-  if (!inflight) {
-    inflight = fetchFeed().then(feed => {
-      cached = feed;
-      inflight = null;
+  if (!inflight.has(channel)) {
+    inflight.set(channel, fetchFeed(channel).then(feed => {
+      cached.set(channel, feed);
+      inflight.delete(channel);
       return feed;
-    });
+    }));
   }
-  const feed = await inflight;
+  const feed = await inflight.get(channel)!;
   return Response.json(feed);
 }

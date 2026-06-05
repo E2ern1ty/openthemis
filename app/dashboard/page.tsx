@@ -57,6 +57,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [interval, setIntervalSec] = useState(0);
+  const [channel, setChannel] = useState<string>('weibo');
   const [selected, setSelected] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [lastRefreshed, setLastRefreshed] = useState<Date | null>(null);
@@ -78,7 +79,7 @@ export default function DashboardPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const r = await fetch('/api/dashboard?window=40&top=14');
+      const r = await fetch(`/api/dashboard?channel=${channel}&window=40&top=14`);
       const d: DashboardData = await r.json();
       applyData(d);
     } catch (e) {
@@ -86,13 +87,13 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [applyData]);
+  }, [applyData, channel]);
 
   // 抓取新快照
   const refresh = useCallback(async () => {
     setRefreshing(true);
     try {
-      const r = await fetch('/api/dashboard?window=40&top=14', { method: 'POST' });
+      const r = await fetch(`/api/dashboard?channel=${channel}&window=40&top=14`, { method: 'POST' });
       const d: DashboardData = await r.json();
       applyData(d);
       setLastRefreshed(new Date());
@@ -141,12 +142,27 @@ export default function DashboardPage() {
         <div>
           <h1 className="text-xl font-bold text-slate-900">舆情看板</h1>
           <p className="text-sm text-slate-500 mt-1">
-            微博热搜实时监测 · 话题关键词趋势
+            {channel === 'reddit' ? 'Reddit 热门' : '微博热搜'}实时监测 · 话题关键词趋势
             {data?.capturedAt && <span className="ml-2 text-slate-400">最近更新 {fmtTime(data.capturedAt)}</span>}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
+          {/* 数据源切换 */}
+          <div className="flex items-center gap-0.5 bg-slate-100 rounded-lg p-0.5">
+            {[{ id: 'weibo', label: '微博' }, { id: 'reddit', label: 'Reddit' }].map((src) => (
+              <button
+                key={src.id}
+                onClick={() => { if (src.id !== channel) { selectedInit.current = false; setSelected([]); setChannel(src.id); } }}
+                className={`text-xs px-2.5 py-1 rounded-md transition-colors ${
+                  channel === src.id ? 'bg-white text-slate-800 shadow-sm font-medium' : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                {src.label}
+              </button>
+            ))}
+          </div>
+
           {/* refresh interval selector */}
           <div className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg px-2.5 py-1.5">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

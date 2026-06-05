@@ -40,13 +40,13 @@ interface RawHot {
   url?: string;
 }
 
-/** 从采集层拉取一次微博热搜并落库为快照。返回该快照。 */
+/** 从采集层拉取一次实时热门并落库为快照。返回该快照。 */
 export async function captureSnapshot(channel = 'weibo', limit = 50): Promise<HotSnapshot> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 90_000);
   let topics: SnapshotTopic[] = [];
   try {
-    const res = await fetch(`${collectorBase()}/${channel}/hot?limit=${limit}`, {
+    const res = await fetch(`${collectorBase()}/hot?channel=${encodeURIComponent(channel)}&limit=${limit}`, {
       headers: authHeaders(),
       signal: controller.signal,
     });
