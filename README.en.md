@@ -4,6 +4,16 @@
 
 **English** · [简体中文](README.md)
 
+<p>
+  <a href="https://github.com/E2ern1ty/openthemis/stargazers"><img src="https://img.shields.io/github/stars/E2ern1ty/openthemis?style=flat&logo=github&color=f5c518" alt="Stars" /></a>
+  <a href="https://github.com/E2ern1ty/openthemis/network/members"><img src="https://img.shields.io/github/forks/E2ern1ty/openthemis?style=flat&logo=github" alt="Forks" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/E2ern1ty/openthemis?color=blue" alt="License" /></a>
+  <img src="https://img.shields.io/badge/Next.js-16-black?logo=next.js" alt="Next.js 16" />
+  <img src="https://img.shields.io/badge/TypeScript-5.8-3178c6?logo=typescript&logoColor=white" alt="TypeScript" />
+</p>
+
+> Find it useful? Give it a ⭐ **[Star](https://github.com/E2ern1ty/openthemis)** to help others discover it.
+
 ---
 
 ## 1. Overview

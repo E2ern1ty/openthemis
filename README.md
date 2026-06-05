@@ -4,6 +4,16 @@
 
 [English](README.en.md) · **简体中文**
 
+<p>
+  <a href="https://github.com/E2ern1ty/openthemis/stargazers"><img src="https://img.shields.io/github/stars/E2ern1ty/openthemis?style=flat&logo=github&color=f5c518" alt="Stars" /></a>
+  <a href="https://github.com/E2ern1ty/openthemis/network/members"><img src="https://img.shields.io/github/forks/E2ern1ty/openthemis?style=flat&logo=github" alt="Forks" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/E2ern1ty/openthemis?color=blue" alt="License" /></a>
+  <img src="https://img.shields.io/badge/Next.js-16-black?logo=next.js" alt="Next.js 16" />
+  <img src="https://img.shields.io/badge/TypeScript-5.8-3178c6?logo=typescript&logoColor=white" alt="TypeScript" />
+</p>
+
+> 觉得有用？点个 ⭐ **[Star](https://github.com/E2ern1ty/openthemis)** 支持一下，让更多人发现它。
+
 ---
 
 ## 一、产品定位
