@@ -111,7 +111,7 @@ export default function DashboardPage() {
     } finally {
       setRefreshing(false);
     }
-  }, [applyData]);
+  }, [applyData, channel]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -163,7 +163,7 @@ export default function DashboardPage() {
             {[{ id: 'weibo', label: t('微博', 'Weibo') }, { id: 'reddit', label: 'Reddit' }].map((src) => (
               <button
                 key={src.id}
-                onClick={() => { if (src.id !== channel) { selectedInit.current = false; setSelected([]); setChannel(src.id); } }}
+                onClick={() => { if (src.id !== channel) { selectedInit.current = false; setSelected([]); setData(null); setError(null); setChannel(src.id); } }}
                 className={`text-xs px-2.5 py-1 rounded-md transition-colors ${
                   channel === src.id ? 'bg-white text-slate-800 shadow-sm font-medium' : 'text-slate-500 hover:text-slate-700'
                 }`}
